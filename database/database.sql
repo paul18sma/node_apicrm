@@ -1,8 +1,8 @@
+DROP TABLE IF EXISTS users 
+
 CREATE TABLE users(
     id SERIAL PRIMARY KEY,
-    name VARCHAR(40),
-    email TEXT
+    name VARCHAR(40) NOT NULL,
+    email VARCHAR(65) UNIQUE NOT NULL,
+    password VARCHAR(150) NOT NULL
 );
-
-
-INSERT INTO users (name, email) VALUES ('joe', 'joe@example.com'), ('ryan', 'ryan@example.com');
