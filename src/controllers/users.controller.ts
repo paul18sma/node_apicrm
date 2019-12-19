@@ -1,11 +1,11 @@
 import { Request, Response } from "express";
-import { QueryResult } from "pg";
-import { pool } from "../database";
+import User from '../models/User';
+
 
 export const getUsers = async (req: Request, res: Response): Promise<Response> => {
     try{
-        const response: QueryResult = await pool.query('SELECT * FROM users');
-        return res.status(200).json(response.rows);
+        const users = await User.findAll();
+        return res.status(200).json(users);
     }catch(e){
         console.log(e);
         return res.status(500).json('Internal Server Error');
@@ -15,8 +15,10 @@ export const getUsers = async (req: Request, res: Response): Promise<Response> =
 export const getUserById = async (req: Request, res: Response): Promise<Response> => {
     try{
         const { id } = req.params;
-        const response: QueryResult = await pool.query('SELECT * FROM users WHERE id = $1', [id]);
-        return res.status(200).json(response.rows);
+        const user = await User.findOne({
+            where: { id }
+        });
+        return res.status(200).json(user);
     }catch(e){
         console.log(e);
         return res.status(500).json('Internal Server Error');
@@ -25,16 +27,10 @@ export const getUserById = async (req: Request, res: Response): Promise<Response
 
 export const createUser = async (req: Request, res: Response): Promise<Response> => {
     try{
-        const { name, email } = req.body;
-        await pool.query('INSERT INTO users (name, email) VALUES ($1, $2)', [name, email]);
+        const { name, email, password } = req.body;
+        const newUser = await User.create({ name, email, password });
         return res.status(200).json({
-            message: 'User created successfully!',
-            body: {
-                user: {
-                    name,
-                    email
-                }
-            }
+            user: newUser
         });
     }catch(e){
         console.log(e);
@@ -45,17 +41,21 @@ export const createUser = async (req: Request, res: Response): Promise<Response>
 export const updateUser = async (req: Request, res: Response): Promise<Response> => {
     try{
         const { id } = req.params;
-        const { name, email } = req.body;
-        await pool.query('UPDATE users SET name = $1, email = $2 WHERE id = $3', [name, email, id]);
+        const { name, email, password } = req.body;
+        const user = await User.findOne({
+            where: { id }
+        });
+
+        await user?.update({
+            name,
+            email,
+            password
+        });
+
         return res.status(200).json({
             message: 'User updated successfully!',
-            body: {
-                user: {
-                    name,
-                    email
-                }
-            }
-        })
+            user
+        });
     }catch(e){
         console.log(e);
         return res.status(500).json({
@@ -67,9 +67,12 @@ export const updateUser = async (req: Request, res: Response): Promise<Response>
 export const deleteUser = async (req: Request, res: Response): Promise<Response> => {
     try{
         const { id } = req.params;
-        await pool.query('DELETE FROM users WHERE id = $1', [id]);
+        const deleteRowCount = await User.destroy({
+            where: { id }
+        })
         return res.status(200).json({
-            message: 'User deleted successfully'
+            message: 'User deleted successfully',
+            count: deleteRowCount
         });
     }catch(e){
         console.log(e);

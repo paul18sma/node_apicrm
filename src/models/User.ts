@@ -11,8 +11,6 @@ class User extends Model {
     public readonly createdAt!: Date;
     public readonly updatedAt!: Date;
 }
-  
-
 
 User.init({
     id: {
