@@ -20,16 +20,38 @@ User.init({
     },
     name: {
         type: DataTypes.STRING(40),
-        allowNull: false
+        allowNull: false,
+        validate: {
+            notNull: {
+                msg: 'name cannot be null'
+            }
+        }
     },
     email: {
         type: DataTypes.STRING(65),
+        unique: true,
         allowNull: false,
-        unique: true
+        validate: {
+            notNull: {
+                msg: 'email cannot be null'
+            },
+            isEmail: {                
+                msg: 'must enter a valid email'
+            }
+        }
     },
     password: { 
         type: DataTypes.STRING(150),
-        allowNull: false
+        allowNull: false,
+        validate: {
+            notNull: {
+                msg: 'password cannot be null'
+            },
+            len: {
+                args: [8, 60],
+                msg: 'password must contain at least 8 chars'
+            }
+        }
     },
 }, {
     tableName: 'users',
