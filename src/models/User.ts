@@ -1,5 +1,6 @@
-import { Sequelize, Model, DataTypes } from 'sequelize';
+import { Model, DataTypes } from 'sequelize';
 import { sequelize } from '../database/database';
+import  bcrypt  from "bcryptjs";
 
 class User extends Model {
     public id!: number; // Note that the `null assertion` `!` is required in strict mode.
@@ -54,9 +55,21 @@ User.init({
         }
     },
 }, {
+    hooks: {
+        beforeSave: (user) => {
+            // On create or update action, we check if the password changed.
+            // With this control we avoid make a hash from the hash on update action
+            // only if the password is absent. Otherwise we hash the password.
+            if (user.changed('password')) {
+                const salt = bcrypt.genSaltSync(10);
+                const passwordDigest = bcrypt.hashSync(user.password, salt);
+                user.password = passwordDigest;
+            }
+        }
+    },
     tableName: 'users',
     timestamps: false,
     sequelize: sequelize, // this bit is important
-})
+});
 
 export default User;
