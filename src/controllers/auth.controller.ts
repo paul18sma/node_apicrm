@@ -1,12 +1,15 @@
 import { Request, Response } from "express";
 import { ValidationError, ValidationErrorItem, BaseError } from 'sequelize';
 
+import * as JWT from 'jsonwebtoken';
+
 import User from '../models/User';
+import config from '../config';
 
 
 export const signIn = async (req: Request, res: Response): Promise<Response> => {
-    console.log('signIn');
-    return res.send('sign in');
+    console.log('sign in');
+    return res.send('sign in');        
 }
 
 export const signUp = async (req: Request, res: Response): Promise<Response> => {
@@ -16,10 +19,10 @@ export const signUp = async (req: Request, res: Response): Promise<Response> => 
         // On User model, into sequelize def, we handle validations and it errors message.
         const { name, email, password } = req.body;
         const newUser = await User.create({ name, email, password });
-       
+        const token = signInToken(newUser);
         return res.status(200).json({
             msg: 'User created successfully!',
-            user: newUser
+            token
         });
     }catch(err){
         // catch any error
@@ -31,11 +34,19 @@ export const signUp = async (req: Request, res: Response): Promise<Response> => 
                     errors.push({name: e.path, message: e.message});
                 }
             });
-            // return errors with code 400
             console.log(errors);
             return res.status(400).json(errors);
         } 
 
         return res.status(500).json('Internal server error');
     }
+}
+
+const signInToken = (user: User) => {
+    return JWT.sign({
+        iss: "naapi",
+        sub: user.id,
+        iat: new Date().getTime(),
+        exp: new Date().setDate(new Date().getDate() + 1)
+    }, config.JWT_SECRET);
 }
