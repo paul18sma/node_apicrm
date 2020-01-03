@@ -42,6 +42,10 @@ export const signUp = async (req: Request, res: Response): Promise<Response> => 
     }
 }
 
+export const profile = async (req: Request, res:Response): Promise<Response> => {
+    return res.send('profile');
+}
+
 const signInToken = (user: User) => {
     return JWT.sign({
         iss: "naapi",

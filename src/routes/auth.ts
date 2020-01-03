@@ -1,10 +1,12 @@
-import { Router } from "express";
-import { signIn, signUp } from "../controllers/auth.controller";
+import Router from "express-promise-router";
+import { signIn, signUp, profile } from "../controllers/auth.controller";
+import passport from "../passportConfig";
 
 const router = Router();
 
-router.post('/sign-in', signIn);
-router.post('/sign-up', signUp);
+router.route('/sign-in').post(signIn);
+router.route('/sign-up').post(signUp);
+router.route('/profile').get(passport.authenticate('jwt', { session: false}), profile);
 
 
 export default router;
