@@ -8,8 +8,14 @@ import config from '../config';
 
 
 export const signIn = async (req: Request, res: Response): Promise<Response> => {
-    console.log('sign in');
-    return res.send('sign in');        
+
+    const user = req.user as User;    
+    const token = signInToken(user);
+
+    return res.status(200).json({
+        msg: 'User created successfully!',
+        token
+    });  
 }
 
 export const signUp = async (req: Request, res: Response): Promise<Response> => {
@@ -43,7 +49,10 @@ export const signUp = async (req: Request, res: Response): Promise<Response> => 
 }
 
 export const profile = async (req: Request, res:Response): Promise<Response> => {
-    return res.send('profile');
+    return res.status(200).json({
+        msg: 'Profile',
+        user: req.user as User
+    });
 }
 
 const signInToken = (user: User) => {

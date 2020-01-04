@@ -3,6 +3,7 @@ import { sequelize } from '../database/database';
 import  bcrypt  from "bcryptjs";
 
 class User extends Model {
+    
     public id!: number; // Note that the `null assertion` `!` is required in strict mode.
     public name!: string;
     public email!: string;
@@ -11,6 +12,15 @@ class User extends Model {
     // timestamps!
     public readonly createdAt!: Date;
     public readonly updatedAt!: Date;
+
+    public isValidPassword = async (newPassword: string): Promise<boolean> => {
+        try{
+            return await bcrypt.compare(newPassword, this.password);
+        } catch(err){
+            throw new Error(err);
+        }
+    }
+   
 }
 
 User.init({
