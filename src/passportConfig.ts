@@ -20,13 +20,13 @@ passport.use(new JwtStrategy({
 
         // if user doesn't exists, handle it
         if(!user){
-            return done(null, false);
+            throw new Error('Unauthorized.');
         }
         
         // otherwise, return the user
         done(null, user);
     }catch(err){
-        done(err, false);
+        done(err.message, false);
     }
 }));
 
@@ -41,7 +41,7 @@ passport.use(new LocalStrategy({
         
         // if not, handle it
         if(!user){
-            return done(null, false);
+            throw new Error('Invalid credentials.');
         }
         
         // check if the password is correct
@@ -49,12 +49,12 @@ passport.use(new LocalStrategy({
         
         // if not, handle it
         if(!isMatch){
-            return done(null, false);
+            throw new Error('Invalid credentials.');
         }
         // otherwise, return the user
         done(null, user);
     }catch(err){
-        done(err, false);
+        done(err.message, false);
     }
 }));
 
