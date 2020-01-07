@@ -20,18 +20,19 @@ passport.use(new JwtStrategy({
 
         // if user doesn't exists, handle it
         if(!user){
-            throw new Error('Unauthorized.');
+            return done(null, false, {message: 'Unauthorized.'});
         }
         
         // otherwise, return the user
         done(null, user);
     }catch(err){
-        done(err.message, false);
+        done(err, false);
     }
 }));
 
 passport.use(new LocalStrategy({
-    usernameField: 'email'
+    usernameField: 'email',
+    passwordField: 'password'    
 }, async (email, password, done) => {
     try{
         // find the user given the email
@@ -41,7 +42,7 @@ passport.use(new LocalStrategy({
         
         // if not, handle it
         if(!user){
-            throw new Error('Invalid credentials.');
+            return done(null, false, {message: 'Invalid credentials.'});
         }
         
         // check if the password is correct
@@ -49,12 +50,12 @@ passport.use(new LocalStrategy({
         
         // if not, handle it
         if(!isMatch){
-            throw new Error('Invalid credentials.');
+            return done(null, false, {message: 'Invalid credentials.'});
         }
         // otherwise, return the user
         done(null, user);
     }catch(err){
-        done(err.message, false);
+        done(err, false);
     }
 }));
 

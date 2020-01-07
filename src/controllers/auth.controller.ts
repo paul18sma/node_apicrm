@@ -11,9 +11,9 @@ export const signIn = async (req: Request, res: Response): Promise<Response> => 
 
     const user = req.user as User;    
     const token = signInToken(user);
-
+    
     return res.status(200).json({
-        msg: 'User created successfully!',
+        msg: 'User sign in successfully!',
         token
     });  
 }
