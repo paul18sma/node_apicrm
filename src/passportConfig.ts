@@ -1,3 +1,4 @@
+import {Request, Response, NextFunction} from 'express';
 import passport from 'passport';
 import passportJwt from 'passport-jwt';
 import passportLocal from 'passport-local';
@@ -59,4 +60,23 @@ passport.use(new LocalStrategy({
     }
 }));
 
-export default passport;
+const authenticationMiddleware = (req: Request, res: Response, next: NextFunction, authenticationType: string) => {
+    passport.authenticate(authenticationType, {session: false}, (err, user, info) => {
+        if (err) { return next(err) }
+        
+        if (!user) {
+            return res.status(400).json(info);
+        }
+        req.user = user;
+        next();
+    })(req, res, next);
+};
+
+// authentication methods
+export const passportMiddlewareLocal = (req: Request, res: Response, next: NextFunction) => {
+    authenticationMiddleware(req, res, next, 'local');
+};
+
+export const passportMiddlewareJwt = (req: Request, res: Response, next: NextFunction) => {
+    authenticationMiddleware(req, res, next, 'jwt');
+}
